@@ -1,0 +1,20 @@
+{
+  "name": "twitch-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "twitch": "^4.4.12",
+    "twitch-auth": "^4.4.12",
+    "twitch-chat-client": "^4.4.12"
+  }
+}
