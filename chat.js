@@ -1,7 +1,6 @@
-const { response } = require('express');
 const tmi = require('tmi.js');
 
-const connect = async (bot, channel) => {
+const connect = async (bot, channel, io) => {
   bot.client = new tmi.Client({
     connection: { reconnect: true },
     channels: [channel]
@@ -22,7 +21,9 @@ const connect = async (bot, channel) => {
           response.count++; // Increment word count if it already exists
         } else {
           bot.responses.push({ text: message, count: 1 }); // Push word and set count to 1 if response doesn't exist
-          console.log({ reponses: bot.responses, users: bot.users });
+          io.on('connection', socket => {
+            socket.emit('response', bot);
+          });
         }
       }
     });

@@ -6,7 +6,7 @@ const errorMsg = document.querySelector('#error-message');
 channelForm.addEventListener('submit', e => {
   e.preventDefault();
   errorMsg.hidden = false;
-  // openConnection(channelName.value);
+  openConnection(channelName.value);
 });
 
 const openConnection = async channel => {
