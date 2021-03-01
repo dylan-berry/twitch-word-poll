@@ -11,10 +11,10 @@ const connect = async (bot, channel) => {
     await bot.client.connect();
 
     bot.client.on('message', (channel, tags, message, self) => {
-      // console.log(`${tags['display-name']}: ${message}`);
+      message = message.trim().toLowerCase();
       if (bot.users.some(user => user === tags['display-name'])) {
         console.log('User already answered.');
-      } else if (message.trim().split(' ').length > 1) {
+      } else if (message.split(' ').length > 1) {
         console.log('User submitted more than 1 word.');
       } else {
         bot.users.push(tags['display-name']); // Push user to array
