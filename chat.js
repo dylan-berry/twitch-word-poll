@@ -1,17 +1,15 @@
-const { response } = require('express');
 const tmi = require('tmi.js');
 
-const connect = async (bot, channel) => {
+const connect = async (bot, channel, io) => {
   bot.client = new tmi.Client({
     connection: { reconnect: true },
-    channels: [channel]
+    channels: [channel],
   });
 
   try {
     await bot.client.connect();
 
     bot.client.on('message', (channel, tags, message, self) => {
-      // console.log(`${tags['display-name']}: ${message}`);
       if (bot.users.some(user => user === tags['display-name'])) {
         console.log('User already answered.');
       } else if (message.trim().split(' ').length > 1) {
@@ -22,7 +20,9 @@ const connect = async (bot, channel) => {
           response.count++; // Increment word count if it already exists
         } else {
           bot.responses.push({ text: message, count: 1 }); // Push word and set count to 1 if response doesn't exist
-          console.log({ reponses: bot.responses, users: bot.users });
+          io.on('connection', socket => {
+            socket.emit('response', bot);
+          });
         }
       }
     });

@@ -28,7 +28,19 @@
       </div>
     </div>
 
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      socket.on('response', data => {
+        console.log(data);
+      });
+    </script>
+
     <script type="module" src="index.js"></script>
+
+    <!-- Vue -->
     <script type="text/javascript">
       var app = new Vue({
         el: '#app',
@@ -38,11 +50,11 @@
             { text: 'word', count: 3 },
             { text: 'to', count: 7 },
             { text: 'ya', count: 2 },
-            { text: 'brotha', count: 5 }
+            { text: 'brotha', count: 5 },
           ],
-          users: ['bobby', 'michael', 'jenny', 'pedro', 'kate']
+          users: ['bobby', 'michael', 'jenny', 'pedro', 'kate'],
         },
-        methods: {}
+        methods: {},
       });
     </script>
   </body>
