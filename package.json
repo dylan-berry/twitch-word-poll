@@ -1,8 +1,8 @@
 {
-  "name": "twitch-app",
+  "name": "twitch-chat-poll",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,11 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
-    "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "twitch": "^4.4.12",
-    "twitch-auth": "^4.4.12",
-    "twitch-chat-client": "^4.4.12"
+    "socket.io": "^3.1.2",
+    "tmi.js": "^1.7.2"
   }
 }

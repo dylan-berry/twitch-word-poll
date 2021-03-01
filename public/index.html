@@ -1,0 +1,49 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <nav class="shadow-sm font-semibold mb-10 p-3">Twitch Chat Poll</nav>
+      <div class="container mx-auto">
+        <div class="max-w-2xl mx-auto px-5">
+          <form id="channel-form" class="text-center" action="submit">
+            <input id="channel-name" type="text" class="text-xl border-b mr-3 py-1 px-2" placeholder="Channel name" />
+            <button id="connect-btn" class="bg-indigo-600 rounded text-white py-1 px-3">Connect</button>
+            <p id="error-message" class="text-red-500 text-sm my-3" hidden>Error connecting to channel</p>
+          </form>
+          <p class="text-right mt-10">Total responses: {{users.length}}</p>
+          <ul>
+            <li class="flex justify-between rounded border p-5 mb-5 text-5xl" v-for="response in responses" :key="response.text">
+              <span>{{response.text}}</span>
+              <span>{{response.count}}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="index.js"></script>
+    <script type="text/javascript">
+      var app = new Vue({
+        el: '#app',
+        data: {
+          channel: '',
+          responses: [
+            { text: 'word', count: 3 },
+            { text: 'to', count: 7 },
+            { text: 'ya', count: 2 },
+            { text: 'brotha', count: 5 }
+          ],
+          users: ['bobby', 'michael', 'jenny', 'pedro', 'kate']
+        },
+        methods: {}
+      });
+    </script>
+  </body>
+</html>
