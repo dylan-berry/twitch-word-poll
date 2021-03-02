@@ -19,7 +19,7 @@
           </form>
           <p class="text-right mt-10">Total responses: {{users.length}}</p>
           <ul>
-            <li class="flex justify-between rounded border p-5 mb-5 text-5xl" v-for="response in responses" :key="response.text">
+            <li class="flex justify-between rounded border p-5 mb-5 text-5xl" v-for="response in sortedResponses" :key="response.text">
               <span>{{response.text}}</span>
               <span>{{response.count}}</span>
             </li>
@@ -43,6 +43,11 @@
           channel: '',
           responses: [],
           users: []
+        },
+        computed: {
+          sortedResponses: function () {
+            return this.responses.sort((a, b) => b.count - a.count);
+          }
         },
         methods: {},
         mounted: function () {
