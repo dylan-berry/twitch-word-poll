@@ -61,7 +61,6 @@
           openConnection: async function () {
             const res = await fetch(`/channel/${this.channel}`);
             const data = await res.json();
-            console.log(data.msg);
 
             if (data.msg === 'Connected') {
               this.btnText = 'Disconnect';
