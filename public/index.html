@@ -12,10 +12,10 @@
       <nav class="shadow-sm font-semibold mb-10 p-3">Twitch Chat Poll</nav>
       <div class="container mx-auto">
         <div class="max-w-2xl mx-auto px-5">
-          <form id="channel-form" class="text-center" action="submit">
-            <input id="channel-name" type="text" class="text-xl border-b mr-3 py-1 px-2" placeholder="Channel name" />
-            <button id="connect-btn" class="bg-indigo-600 rounded text-white py-1 px-3">Connect</button>
-            <p id="error-message" class="text-red-500 text-sm my-3" hidden>Error connecting to channel</p>
+          <form class="text-center" @submit.prevent="submitChannel">
+            <input type="text" class="text-xl border-b mr-3 py-1 px-2" placeholder="Channel name" v-model="channel" />
+            <button class="rounded text-white py-1 px-3" :class="btnColor">{{btnText}}</button>
+            <p v-if="error" class="text-red-500 text-sm my-3">{{error}}</p>
           </form>
           <p class="text-right mt-10">Total responses: {{users.length}}</p>
           <ul>
@@ -28,8 +28,6 @@
       </div>
     </div>
 
-    <script type="module" src="index.js"></script>
-
     <!-- Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
 
@@ -40,7 +38,10 @@
       var app = new Vue({
         el: '#app',
         data: {
+          btnColor: 'bg-green-500',
+          btnText: 'Connect',
           channel: '',
+          error: '',
           responses: [],
           users: []
         },
@@ -49,7 +50,32 @@
             return this.responses.sort((a, b) => b.count - a.count);
           }
         },
-        methods: {},
+        methods: {
+          submitChannel: function () {
+            if (this.channel) {
+              this.openConnection();
+            } else {
+              this.error = 'Must enter channel name.';
+            }
+          },
+          openConnection: async function () {
+            const res = await fetch(`/channel/${this.channel}`);
+            const data = await res.json();
+            console.log(data.msg);
+
+            if (data.msg === 'Connected') {
+              this.btnText = 'Disconnect';
+              this.btnColor = 'bg-red-500';
+              this.error = '';
+            } else if (data.msg === 'Disconnected') {
+              this.btnText = 'Connect';
+              this.btnColor = 'bg-green-500';
+              this.error = '';
+            } else {
+              this.error = 'Unable to connect to chat';
+            }
+          }
+        },
         mounted: function () {
           socket.on('response', data => {
             this.responses = data.responses;

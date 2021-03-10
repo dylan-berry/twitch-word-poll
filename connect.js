@@ -1,4 +1,5 @@
 const tmi = require('tmi.js');
+const sanitizeText = require('./sanitizeText.js');
 
 const connect = async (bot, channel) => {
   const io = require('./socket.js').get();
@@ -12,7 +13,6 @@ const connect = async (bot, channel) => {
     await bot.client.connect();
 
     bot.client.on('message', (channel, tags, message, self) => {
-      message = message.trim().toLowerCase();
       // if (bot.users.some(user => user === tags['display-name'])) {
       //   console.log('User already answered.');
       // }
@@ -20,6 +20,7 @@ const connect = async (bot, channel) => {
         console.log('User submitted more than 1 word.');
       } else {
         bot.users.push(tags['display-name']); // Push user to array
+        message = sanitizeText(message);
         if (bot.responses.some(response => response.text === message)) {
           const index = bot.responses.findIndex(response => response.text === message); // Get index of matching response
           bot.responses[index].count++; // Increment word count if it already exists
