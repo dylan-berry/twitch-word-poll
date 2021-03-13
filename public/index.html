@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-    <title>Document</title>
+    <title>Twitch Word Poll</title>
   </head>
   <body class="ff-bg-black">
     <div id="app">
-      <nav class="shadow-sm font-semibold mb-10 p-3">Twitch Chat Poll</nav>
+      <nav class="shadow-sm font-semibold mb-10 p-3">Twitch Word Poll</nav>
       <div class="container mx-auto">
         <div class="max-w-xl mx-auto px-5">
           <form class="text-center" @submit.prevent="submitChannel">
@@ -28,21 +28,19 @@
       </div>
     </div>
 
-    <!-- Socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="./scripts/tmi.min.js"></script>
 
     <!-- Vue -->
     <script type="text/javascript">
-      const socket = io();
-
       var app = new Vue({
         el: '#app',
         data: {
           btnColor: 'bg-green-500',
           btnText: 'Connect',
           channel: '',
+          client: '',
           error: '',
-          id: '',
+          socketID: '',
           responses: [],
           users: []
         },
@@ -54,39 +52,72 @@
         methods: {
           submitChannel: function () {
             if (this.channel) {
-              this.openConnection();
+              this.btnText === 'Connect' ? this.openConnection() : this.closeConnection();
             } else {
               this.error = 'Must enter channel name.';
             }
           },
-          openConnection: async function () {
-            const res = await fetch(`/channel/${this.channel}/${this.id}`);
-            const data = await res.json();
+          closeConnection: async function () {
+            this.client.disconnect();
+            this.client = '';
 
-            if (data.msg === 'Connected') {
+            this.btnText = 'Connect';
+            this.btnColor = 'bg-green-500';
+            this.error = '';
+          },
+          openConnection: async function () {
+            this.client = new tmi.Client({
+              connection: { reconnect: true },
+              channels: [this.channel]
+            });
+
+            await this.connect();
+
+            if (this.client) {
               this.btnText = 'Disconnect';
               this.btnColor = 'bg-red-500';
               this.error = '';
               this.responses = [];
               this.users = [];
-            } else if (data.msg === 'Disconnected') {
-              this.btnText = 'Connect';
-              this.btnColor = 'bg-green-500';
-              this.error = '';
             } else {
               this.error = 'Unable to connect to chat';
             }
-          }
-        },
-        mounted: function () {
-          socket.on('response', data => {
-            this.responses = data.responses;
-            this.users = data.users;
-          });
+          },
+          connect: async function () {
+            try {
+              await this.client.connect();
 
-          socket.on('connection', socketID => {
-            this.id = socketID;
-          });
+              this.client.on('chat', (channel, tags, message, self) => {
+                if (this.users.some(user => user === tags['display-name'])) {
+                  console.log('[DEBUG] User already responded.');
+                } else if (message.split(' ').length > 1) {
+                  console.log('[DEBUG] User submitted more than 1 word.');
+                } else {
+                  message = this.sanitizeText(message);
+                  this.handleResponse({ user: tags['display-name'], message });
+                }
+              });
+            } catch (error) {
+              console.log('Error connecting to chat');
+            }
+          },
+          handleResponse: function (res) {
+            this.users.push(res.user);
+
+            if (this.responses.some(response => response.text === res.message)) {
+              const index = this.responses.findIndex(response => response.text === res.message); // Get index of matching response
+              this.responses[index].count++; // Increment word count if it already exists
+            } else {
+              this.responses.push({ text: res.message, count: 1 }); // Push word and set count to 1 if response doesn't exist
+            }
+          },
+          sanitizeText: function (text) {
+            const regex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
+            text = text.trim().toLowerCase();
+            text = text.replace(regex, '');
+
+            return text;
+          }
         }
       });
     </script>
