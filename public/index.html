@@ -7,11 +7,11 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <title>Document</title>
   </head>
-  <body>
+  <body class="ff-bg-black">
     <div id="app">
       <nav class="shadow-sm font-semibold mb-10 p-3">Twitch Chat Poll</nav>
       <div class="container mx-auto">
-        <div class="max-w-2xl mx-auto px-5">
+        <div class="max-w-xl mx-auto px-5">
           <form class="text-center" @submit.prevent="submitChannel">
             <input type="text" class="text-xl border-b mr-3 py-1 px-2" placeholder="Channel name" v-model="channel" />
             <button class="rounded text-white py-1 px-3" :class="btnColor">{{btnText}}</button>
@@ -19,7 +19,7 @@
           </form>
           <p class="text-right mt-10">Total responses: {{users.length}}</p>
           <ul>
-            <li class="flex justify-between rounded border p-5 mb-5 text-5xl" v-for="response in sortedResponses" :key="response.text">
+            <li class="flex justify-between p-5 mb-5 text-5xl border rounded" v-for="response in sortedResponses" :key="response.text">
               <span>{{response.text}}</span>
               <span>{{response.count}}</span>
             </li>
@@ -42,6 +42,7 @@
           btnText: 'Connect',
           channel: '',
           error: '',
+          id: '',
           responses: [],
           users: []
         },
@@ -59,13 +60,15 @@
             }
           },
           openConnection: async function () {
-            const res = await fetch(`/channel/${this.channel}`);
+            const res = await fetch(`/channel/${this.channel}/${this.id}`);
             const data = await res.json();
 
             if (data.msg === 'Connected') {
               this.btnText = 'Disconnect';
               this.btnColor = 'bg-red-500';
               this.error = '';
+              this.responses = [];
+              this.users = [];
             } else if (data.msg === 'Disconnected') {
               this.btnText = 'Connect';
               this.btnColor = 'bg-green-500';
@@ -79,6 +82,10 @@
           socket.on('response', data => {
             this.responses = data.responses;
             this.users = data.users;
+          });
+
+          socket.on('connection', socketID => {
+            this.id = socketID;
           });
         }
       });
